@@ -15,23 +15,34 @@
 <!-- Capture Button -->
 <button id="captureBtn">Capture Image</button>
 
+<!-- Retake Button -->
+<button id="retakeBtn">Retake</button>
+
 <br><br>
 
-<!-- Canvas where captured image will appear -->
+<!-- Canvas to display image -->
 <canvas id="canvas" width="400" height="300"></canvas>
 
 <br><br>
 
-<!-- Logout Button -->
+<!-- Logout -->
 <button onclick="logout()">Logout</button>
 
 
 <script>
 // ================================
-// 1. Start Camera
+// Elements
 // ================================
 const video = document.getElementById("video");
+const canvas = document.getElementById("canvas");
+const ctx = canvas.getContext("2d");
 
+const CAPTURE_KEY = "savedImage"; // localStorage key
+
+
+// ================================
+// 1. Start Camera
+// ================================
 navigator.mediaDevices.getUserMedia({ video: true })
 .then(stream => {
     video.srcObject = stream;
@@ -42,19 +53,54 @@ navigator.mediaDevices.getUserMedia({ video: true })
 
 
 // ================================
-// 2. Capture Image
+// 2. Load saved image (if exists)
 // ================================
-const canvas = document.getElementById("canvas");
-const ctx = canvas.getContext("2d");
+function loadSavedImage() {
+    const data = localStorage.getItem(CAPTURE_KEY);
 
+    if (data) {
+        const img = new Image();
+        img.onload = function () {
+            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+        };
+        img.src = data;
+    }
+}
+
+loadSavedImage(); // run on page load
+
+
+
+// ================================
+// 3. Capture Image
+// ================================
 document.getElementById("captureBtn").onclick = function () {
     ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-    alert("Image Captured!");
+
+    // Save captured image in localStorage
+    const dataURL = canvas.toDataURL();
+    localStorage.setItem(CAPTURE_KEY, dataURL);
+
+    alert("Image Captured & Saved!");
 };
 
 
 // ================================
-// 3. Logout → Redirect to Login Page
+// 4. Retake → Remove old image
+// ================================
+document.getElementById("retakeBtn").onclick = function () {
+    // Clear canvas
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    // Remove from storage
+    localStorage.removeItem(CAPTURE_KEY);
+
+    alert("Old image deleted. You can capture again.");
+};
+
+
+// ================================
+// 5. Logout → go back to login page
 // ================================
 function logout() {
     window.location.href = "index.html";
