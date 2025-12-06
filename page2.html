@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Dashboard</title>
+</head>
+
+<body>
+
+<h2>Welcome Aimen!</h2>
+
+<!-- Live Camera -->
+<video id="video" width="400" height="300" autoplay></video>
+<br><br>
+
+<!-- Capture Button -->
+<button id="captureBtn">Capture Image</button>
+
+<br><br>
+
+<!-- Canvas where captured image will appear -->
+<canvas id="canvas" width="400" height="300"></canvas>
+
+<br><br>
+
+<!-- Logout Button -->
+<button onclick="logout()">Logout</button>
+
+
+<script>
+// ================================
+// 1. Start Camera
+// ================================
+const video = document.getElementById("video");
+
+navigator.mediaDevices.getUserMedia({ video: true })
+.then(stream => {
+    video.srcObject = stream;
+})
+.catch(err => {
+    console.log("Camera error:", err);
+});
+
+
+// ================================
+// 2. Capture Image
+// ================================
+const canvas = document.getElementById("canvas");
+const ctx = canvas.getContext("2d");
+
+document.getElementById("captureBtn").onclick = function () {
+    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+    alert("Image Captured!");
+};
+
+
+// ================================
+// 3. Logout → Redirect to Login Page
+// ================================
+function logout() {
+    window.location.href = "index.html";
+}
+</script>
+
+</body>
+</html>
